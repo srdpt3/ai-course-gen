@@ -8,9 +8,9 @@ const DashboardLayout = ({ children }) => {
       <div className="md:w-64 hidden md:block">
         <SideBar></SideBar>
       </div>
-      <div className="md:ml-64 p-10">
+      <div className="md:ml-64 p-5">
         <Header />
-        <div className="p-10"></div>
+        <div className="p-5"></div>
         {children}
       </div>
     </div>
