@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 import React from "react";
 
 const AddCourse = () => {
@@ -13,7 +14,9 @@ const AddCourse = () => {
           Create new cource with AI, Share with friends and Earn it
         </p>
       </div>
-      <Button>+ Create AI Cource</Button>
+      <Link href={"/create-course"}>
+        <Button>+ Create AI Cource</Button>
+      </Link>
     </div>
   );
 };
