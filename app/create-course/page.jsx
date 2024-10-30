@@ -6,6 +6,9 @@ import {
   HiLightBulb,
   HiOutlineSquares2X2,
 } from "react-icons/hi2";
+import SelectCategory from "./_components/SelectCategory";
+import TopicDescription from "./_components/TopicDescription";
+import SelectOption from "./_components/SelectOption";
 
 const CreaeCourse = () => {
   const stepperOptions = [
@@ -15,12 +18,12 @@ const CreaeCourse = () => {
       icon: <HiOutlineSquares2X2 />,
     },
     {
-      id: 1,
-      name: "Topic %",
+      id: 2,
+      name: "Topic",
       icon: <HiLightBulb />,
     },
     {
-      id: 1,
+      id: 3,
       name: "Options",
       icon: <HiClipboardDocumentCheck />,
     },
@@ -52,9 +55,15 @@ const CreaeCourse = () => {
           ))}
         </div>
       </div>
-      <div className="px-10 md:px-20 lg:px-44">
+      <div className="px-10 md:px-20 lg:px-44 mt-10">
         {/* Component */}
-
+        {activeIndex == 0 ? (
+          <SelectCategory />
+        ) : activeIndex == 1 ? (
+          <TopicDescription />
+        ) : (
+          <SelectOption />
+        )}
         {/* Next Previous Button */}
         <div className="flex justify-between mt-10">
           <Button
