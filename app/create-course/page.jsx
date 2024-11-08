@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   HiClipboardDocumentCheck,
   HiLightBulb,
@@ -9,6 +9,7 @@ import {
 import SelectCategory from "./_components/SelectCategory";
 import TopicDescription from "./_components/TopicDescription";
 import SelectOption from "./_components/SelectOption";
+import { UserInputContext } from "@/app/_context/UserInputContext";
 
 const CreaeCourse = () => {
   const stepperOptions = [
@@ -28,8 +29,41 @@ const CreaeCourse = () => {
       icon: <HiClipboardDocumentCheck />,
     },
   ];
+  const { userCourseInput, setUserCourseInput } = useContext(UserInputContext);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    console.log(userCourseInput);
+  }, [userCourseInput]);
+
+  const checkStatus = () => {
+    if (userCourseInput?.length == 0) {
+      return true;
+    }
+    if (
+      activeIndex == 0 &&
+      (userCourseInput?.category?.length == 0 ||
+        userCourseInput?.category?.length == undefined)
+    )
+      return true;
+    if (
+      activeIndex == 1 &&
+      (userCourseInput?.topic?.length == 0 ||
+        userCourseInput?.topic?.length == undefined)
+    ) {
+      return true;
+    } else if (
+      activeIndex == 2 &&
+      (userCourseInput?.level == undefined ||
+        userCourseInput?.duration == undefined ||
+        userCourseInput?.displayVideo == undefined ||
+        userCourseInput?.noOfChapter == undefined)
+    ) {
+      return true;
+    }
+
+    return false;
+  };
   return (
     <div>
       {/* Stepper */}
@@ -74,13 +108,19 @@ const CreaeCourse = () => {
             Previous
           </Button>
           {activeIndex < 2 && (
-            <Button onClick={() => setActiveIndex(activeIndex + 1)}>
+            <Button
+              disabled={checkStatus()}
+              onClick={() => setActiveIndex(activeIndex + 1)}
+            >
               Next
             </Button>
           )}
           {activeIndex == 2 && (
-            <Button onClick={() => setActiveIndex(activeIndex + 1)}>
-              Generate Course Layout
+            <Button
+              disabled={checkStatus()}
+              onClick={() => setActiveIndex(activeIndex + 1)}
+            >
+              Generate Course
             </Button>
           )}
         </div>
