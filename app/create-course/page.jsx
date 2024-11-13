@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState, useContext } from "react";
+import { GenerateCourseLayout_AI } from "@/config/AiModel";
 import {
   HiClipboardDocumentCheck,
   HiLightBulb,
@@ -10,60 +11,68 @@ import SelectCategory from "./_components/SelectCategory";
 import TopicDescription from "./_components/TopicDescription";
 import SelectOption from "./_components/SelectOption";
 import { UserInputContext } from "@/app/_context/UserInputContext";
+import LoadingDialog from "./_components/LoadingDialog";
 
-const CreaeCourse = () => {
+const CreateCourse = () => {
   const stepperOptions = [
-    {
-      id: 1,
-      name: "Category",
-      icon: <HiOutlineSquares2X2 />,
-    },
-    {
-      id: 2,
-      name: "Topic",
-      icon: <HiLightBulb />,
-    },
-    {
-      id: 3,
-      name: "Options",
-      icon: <HiClipboardDocumentCheck />,
-    },
+    { id: 1, name: "Category", icon: <HiOutlineSquares2X2 /> },
+    { id: 2, name: "Topic", icon: <HiLightBulb /> },
+    { id: 3, name: "Options", icon: <HiClipboardDocumentCheck /> },
   ];
-  const { userCourseInput, setUserCourseInput } = useContext(UserInputContext);
 
+  const { userCourseInput, setUserCourseInput } = useContext(UserInputContext);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     console.log(userCourseInput);
   }, [userCourseInput]);
 
   const checkStatus = () => {
-    if (userCourseInput?.length == 0) {
-      return true;
-    }
+    if (!userCourseInput) return true;
+    if (activeIndex === 0 && !userCourseInput?.category) return true;
+    if (activeIndex === 1 && !userCourseInput?.topic) return true;
     if (
-      activeIndex == 0 &&
-      (userCourseInput?.category?.length == 0 ||
-        userCourseInput?.category?.length == undefined)
-    )
-      return true;
-    if (
-      activeIndex == 1 &&
-      (userCourseInput?.topic?.length == 0 ||
-        userCourseInput?.topic?.length == undefined)
-    ) {
-      return true;
-    } else if (
-      activeIndex == 2 &&
-      (userCourseInput?.level == undefined ||
-        userCourseInput?.duration == undefined ||
-        userCourseInput?.displayVideo == undefined ||
-        userCourseInput?.noOfChapter == undefined)
+      activeIndex === 2 &&
+      (userCourseInput?.level == null ||
+        userCourseInput?.duration == null ||
+        userCourseInput?.displayVideo == null ||
+        userCourseInput?.noOfChapter == null)
     ) {
       return true;
     }
-
     return false;
   };
+
+  const GenerateCourseLayout = async () => {
+    const { category, topic, level, duration, noOfChapter } = userCourseInput;
+
+    // Check for missing fields and handle errors if any are undefined
+    setLoading(true);
+    if (!category) console.error("Category is missing.");
+    if (!topic) console.error("Topic is missing.");
+    if (level == null) console.error("Level is missing.");
+    if (duration == null) console.error("Duration is missing.");
+    if (noOfChapter == null) console.error("Number of chapters is missing.");
+
+    const BASIC_PROMPT =
+      "generate a course tutorial on following detail with fields as course name , description, Along with Chapter name about , duration. ";
+    const USER_INPUT_PROMPT = `category: ${category}, topic: ${topic}, level: ${level}, duration: ${duration}, number of chapters: ${noOfChapter} in json format`;
+    const FINAL_PROMPT = BASIC_PROMPT + USER_INPUT_PROMPT;
+
+    console.log("Sending prompt:", FINAL_PROMPT);
+    const result = await GenerateCourseLayout_AI.sendMessage(FINAL_PROMPT); // Directly sending content without custom history parts);
+    // console.log(result.response?.text());
+
+    const jsonString = result.response
+      ?.text()
+      .replace("```json", "")
+      .replace("```", "");
+    console.log(JSON.parse(jsonString));
+
+    setLoading(false);
+  };
+
   return (
     <div>
       {/* Stepper */}
@@ -71,18 +80,22 @@ const CreaeCourse = () => {
         <h2 className="text-4xl text-primary font-medium">Create Course</h2>
         <div className="flex mt-10">
           {stepperOptions.map((item, index) => (
-            <div className="flex items-center">
+            <div className="flex items-center" key={index}>
               <div className="flex flex-col items-center w-[50px] md:w-[100px]">
                 <div
-                  className={`bg-gray-200 p-3 rounded-full text-white ${activeIndex >= index && "bg-purple-500"}`}
+                  className={`bg-gray-200 p-3 rounded-full text-white ${
+                    activeIndex >= index && "bg-purple-500"
+                  }`}
                 >
                   {item.icon}
                 </div>
                 <h2 className="hidden md:block md:text-sm">{item.name}</h2>
               </div>
-              {index != stepperOptions?.length - 1 && (
+              {index !== stepperOptions.length - 1 && (
                 <div
-                  className={`h-1 w-[50px] md:w-[100px] rounded-full lg:w-[170px] bg-gray-300 ${activeIndex - 1 >= index && "bg-purple-500"}`}
+                  className={`h-1 w-[50px] md:w-[100px] rounded-full lg:w-[170px] bg-gray-300 ${
+                    activeIndex - 1 >= index && "bg-purple-500"
+                  }`}
                 ></div>
               )}
             </div>
@@ -91,9 +104,9 @@ const CreaeCourse = () => {
       </div>
       <div className="px-10 md:px-20 lg:px-44 mt-10">
         {/* Component */}
-        {activeIndex == 0 ? (
+        {activeIndex === 0 ? (
           <SelectCategory />
-        ) : activeIndex == 1 ? (
+        ) : activeIndex === 1 ? (
           <TopicDescription />
         ) : (
           <SelectOption />
@@ -101,7 +114,7 @@ const CreaeCourse = () => {
         {/* Next Previous Button */}
         <div className="flex justify-between mt-10">
           <Button
-            disabled={activeIndex == 0}
+            disabled={activeIndex === 0}
             variant="outline"
             onClick={() => setActiveIndex(activeIndex - 1)}
           >
@@ -115,18 +128,16 @@ const CreaeCourse = () => {
               Next
             </Button>
           )}
-          {activeIndex == 2 && (
-            <Button
-              disabled={checkStatus()}
-              onClick={() => setActiveIndex(activeIndex + 1)}
-            >
+          {activeIndex === 2 && (
+            <Button disabled={checkStatus()} onClick={GenerateCourseLayout}>
               Generate Course
             </Button>
           )}
         </div>
       </div>
+      <LoadingDialog loading={loading}></LoadingDialog>
     </div>
   );
 };
 
-export default CreaeCourse;
+export default CreateCourse;
