@@ -12,6 +12,11 @@ import TopicDescription from "./_components/TopicDescription";
 import SelectOption from "./_components/SelectOption";
 import { UserInputContext } from "@/app/_context/UserInputContext";
 import LoadingDialog from "./_components/LoadingDialog";
+import { db } from "@/config/db";
+import { CourseList } from "@/config/schema";
+import uuid4 from "uuid4";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const CreateCourse = () => {
   const stepperOptions = [
@@ -23,7 +28,8 @@ const CreateCourse = () => {
   const { userCourseInput, setUserCourseInput } = useContext(UserInputContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(false);
-
+  const { user } = useUser();
+  const router = useRouter();
   useEffect(() => {
     console.log(userCourseInput);
   }, [userCourseInput]);
@@ -71,6 +77,50 @@ const CreateCourse = () => {
     console.log(JSON.parse(jsonString));
 
     setLoading(false);
+    SaveCourseLayoutInDb(JSON.parse(jsonString));
+  };
+
+  const SaveCourseLayoutInDb = async (courseLayout) => {
+    const id = uuid4();
+
+    try {
+      setLoading(true);
+
+      // Input validation
+      if (
+        !userCourseInput?.topic ||
+        !userCourseInput?.level ||
+        !userCourseInput?.category
+      ) {
+        throw new Error("Missing required course input fields");
+      }
+
+      if (!user?.primaryEmailAddress?.emailAddress) {
+        throw new Error("User email not found");
+      }
+
+      // Generate UUID
+
+      // Fix typo in 'level' field name
+      const result = await db.insert(CourseList).values({
+        courseId: id,
+        name: userCourseInput.topic,
+        level: userCourseInput.level, // Fixed typo from 'levle' to 'level'
+        category: userCourseInput.category,
+        courseOutput: courseLayout,
+        createdBy: user.primaryEmailAddress.emailAddress,
+        userName: user?.fullName || null, // Make optional fields nullable
+        userProfileImage: user?.imageUrl || null,
+      });
+
+      return result;
+    } catch (error) {
+      console.error("Error saving course layout:", error);
+      throw new Error(`Failed to save course: ${error.message}`);
+    } finally {
+      setLoading(false); // Ensure loading state is always reset
+      router.replace("/create-course/" + id);
+    }
   };
 
   return (
