@@ -9,7 +9,8 @@ const CourseBasicInfo = ({ course }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <h2 className="font-bold text-3xl">
-            {course?.courseOutput?.course_name} <EditCourseBasicInfo />
+            {course?.courseOutput?.course_name}{" "}
+            <EditCourseBasicInfo course={course} />
           </h2>
           <p className="text-sm text-gray-500 mt-3">
             {course?.courseOutput?.description}{" "}

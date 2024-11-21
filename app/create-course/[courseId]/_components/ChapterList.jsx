@@ -1,5 +1,6 @@
 import React from "react";
 import { HiOutlineCheckCircle, HiOutlineClock } from "react-icons/hi2";
+import EditChapters from "./EditChapters";
 
 const ChapterList = ({ course }) => {
   return (
@@ -13,7 +14,10 @@ const ChapterList = ({ course }) => {
                 {index + 1}
               </h2>
               <div>
-                <h2>{chapter?.chapter_name}</h2>
+                <h2>
+                  {chapter?.chapter_name}{" "}
+                  <EditChapters course={course} index={index} />
+                </h2>
                 <p className="flex items-center gap-2 text-sm text-gray-500 text-primary">
                   <HiOutlineClock /> {chapter?.duration}
                 </p>

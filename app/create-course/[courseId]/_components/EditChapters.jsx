@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogClose,
@@ -16,17 +16,15 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/config/db";
 import { CourseList } from "@/config/schema";
 import { eq } from "drizzle-orm";
-
-const EditCourseBasicInfo = ({ course }) => {
+import { useState, useEffect } from "react";
+const EditChapters = ({ course, index }) => {
+  const Chapters = course?.courseOutput.chapters;
   const [name, setName] = useState();
-  const [description, setDescription] = useState();
   useEffect(() => {
-    setName(course?.courseOutput?.course_name);
-    setDescription(course?.courseOutput?.description);
-  }, [course]);
+    setName(Chapters[index].chapter_name);
+  }, [Chapters]);
   const onUpdateHandler = async () => {
-    course.courseOutput.course_name = name;
-    course.courseOutput.description = description;
+    course.courseOutput.chapters[index].chapter_name = name;
     const result = await db
       .update(CourseList)
       .set({
@@ -34,9 +32,7 @@ const EditCourseBasicInfo = ({ course }) => {
       })
       .where(eq(CourseList?.id, course?.id))
       .returning();
-    console.log(result);
   };
-
   return (
     <Dialog>
       <DialogTrigger>
@@ -44,22 +40,22 @@ const EditCourseBasicInfo = ({ course }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Course Title & Description</DialogTitle>
+          <DialogTitle>Edit Chapter </DialogTitle>
           <DialogDescription>
             <div className="mt-3">
-              <label>Course Title</label>
+              <label>Chapter Title</label>
               <Input
-                defaultValue={course?.courseOutput?.course_name}
+                defaultValue={Chapters[index].chapter_name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div>
-              <label>Course Description</label>
-              <Textarea
+              {/* <label>Chapter Description</label> */}
+              {/* <Textarea
                 className="h-40"
-                defaultValue={course?.courseOutput?.description}
+                defaultValue={Chapters[index].chapter_name}
                 onChange={(e) => setDescription(e.target.value)}
-              />
+              /> */}
             </div>
           </DialogDescription>
         </DialogHeader>
@@ -75,4 +71,4 @@ const EditCourseBasicInfo = ({ course }) => {
   );
 };
 
-export default EditCourseBasicInfo;
+export default EditChapters;
