@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
 import { HiOutlinePuzzle } from "react-icons/hi";
+import EditCourseBasicInfo from "./EditCourseBasicInfo";
 const CourseBasicInfo = ({ course }) => {
   return (
     <div className="p-10 border-2 rounded-xl shadow-sm mt-5 border-gray-300 rounded-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <h2 className="font-bold text-3xl">
-            {course?.courseOutput?.course_name}
+            {course?.courseOutput?.course_name} <EditCourseBasicInfo />
           </h2>
           <p className="text-sm text-gray-500 mt-3">
             {course?.courseOutput?.description}{" "}
