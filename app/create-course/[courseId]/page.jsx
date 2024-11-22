@@ -16,6 +16,7 @@ const CourseLayout = ({ params }) => {
     params && GetCourse();
   }, [params, user]);
   const GetCourse = async () => {
+    console.log("GetCourse");
     const result = await db
       .select()
       .from(CourseList)
@@ -34,9 +35,10 @@ const CourseLayout = ({ params }) => {
 
       {/* {BasicInfo} */}
 
-      <CourseBasicInfo course={course} />
+      <CourseBasicInfo course={course} refreshData={() => GetCourse()} />
+
       <CourseDetail course={course} />
-      <ChapterList course={course} />
+      <ChapterList course={course} refreshData={() => GetCourse()} />
     </div>
   );
 };
