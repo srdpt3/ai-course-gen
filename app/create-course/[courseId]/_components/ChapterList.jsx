@@ -22,6 +22,7 @@ const ChapterList = ({ course, refreshData }) => {
                     refreshData={() => refreshData(true)}
                   />
                 </h2>
+                <h2 className="text-sm text-gray-500">{chapter?.about}</h2>
                 <p className="flex items-center gap-2 text-sm text-gray-500 text-primary">
                   <HiOutlineClock /> {chapter?.duration}
                 </p>
