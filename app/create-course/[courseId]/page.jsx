@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy } from "lucide-react";
 import { GenerateChapterContent_AI } from "@/config/AiModel";
 import LoadingDialog from "../_components/LoadingDialog";
+import service from "@/config/service";
 const CourseLayout = ({ params }) => {
   const { user } = useUser();
   const [course, setCourse] = useState([]);
@@ -42,11 +43,15 @@ const CourseLayout = ({ params }) => {
       const PROMPT = `explain the concept in detail on topic: ${course?.name} The chapter title is ${chapter.chapter_name}. The chapter content is ${chapter.about}.
 in json format with a list of array with field as title and description in detail, Code example(code field in <precode> format) if applicable`;
       console.log(PROMPT);
-      if (index == 3) {
+      if (index < 3) {
         try {
           console.log("Generating Chapter Content");
           const result = await GenerateChapterContent_AI.sendMessage(PROMPT);
           console.log(result?.response?.text());
+          service.getVideo(course?.name + ":" + chapter?.name).then((resp) => {
+            console.log(resp);
+          });
+
           setIsLoading(false);
         } catch (error) {
           setIsLoading(false);

@@ -18,6 +18,7 @@ const LoadingDialog = ({ loading }) => {
                 <Image src={"/pepe.jpg"} width={100} height={100}></Image>
                 <h2 className="my-3">Please wait... Ai is working on</h2>
               </div>
+            
             </AlertDialogDescription>
           </AlertDialogHeader>
         </AlertDialogContent>
